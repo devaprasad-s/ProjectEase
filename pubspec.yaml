@@ -1,0 +1,46 @@
+name: app_uno
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 0.0.1+1
+
+environment:
+  sdk: '>=2.19.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  english_words: ^4.0.0
+  provider: ^6.0.0
+  firebase_core: ^2.13.1
+  firebase_auth: ^4.6.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/fields/
+    - assets/icons/
+    - assets/fonts/
+  fonts:
+    - family: Product Sans
+      fonts:
+       - asset: assets/fonts/Product Sans Bold Italic.ttf
+       - asset: assets/fonts/Product Sans Bold.ttf
+       - asset: assets/fonts/Product Sans Italic.ttf
+       - asset: assets/fonts/Product Sans Regular.ttf
+    - family: Gilroy-Ultralight
+      fonts:
+       - asset: assets/fonts/Gilroy-Ultralight.ttf
+    - family: Gilroy-Medium
+      fonts:
+       - asset: assets/fonts/Gilroy-Medium.ttf
+       

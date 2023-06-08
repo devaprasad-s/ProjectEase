@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "607224504934",
+    "project_id": "projectease-d4cc7",
+    "storage_bucket": "projectease-d4cc7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607224504934:android:63863f39a33c687c0f03a7",
+        "android_client_info": {
+          "package_name": "com.example.app_uno"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607224504934-1nf24mbdn6t612h8jk5ilurd2pj4t5sv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx-jqyafRHVsmqGEdp0A56eDeAxA1lELw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607224504934-1nf24mbdn6t612h8jk5ilurd2pj4t5sv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "607224504934-q1gugrqda99cdfndjqqcqop7jnr6md4b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appUno"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
