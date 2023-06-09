@@ -2,30 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  final TextEditingController emailRead = TextEditingController();
+  final TextEditingController passRead = TextEditingController();
+  final TextEditingController userRead = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ProjectEase',
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
-        '/signup': (context) => SignupPage(),
+        '/': (context) => LoginPage(
+              emailRead: emailRead,
+              passRead: passRead,
+            ),
+        '/signup': (context) => SignupPage(
+              emailRead: emailRead,
+              passRead: passRead,
+              userRead: userRead,
+            ),
         '/profile': (context) => ProfilePage(),
       },
     );
   }
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  final TextEditingController emailRead;
+  final TextEditingController passRead;
+  LoginPage({required this.emailRead, required this.passRead});
+  @override
+  LoginPageState createState() => LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
+  @override
+  void dispose() {
+    widget.emailRead.dispose();
+    widget.passRead.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,11 +96,12 @@ class LoginPage extends StatelessWidget {
                           SizedBox(height: 20.0),
                           Stack(
                             children: [
-                              Image.asset('assets/fields/username.png'),
+                              Image.asset('assets/fields/email.png'),
                               Padding(
                                 padding:
                                     EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                                 child: TextField(
+                                  controller: widget.emailRead,
                                   decoration: InputDecoration(
                                     hintText: 'eg:JohnDoe',
                                     fillColor: Colors.transparent,
@@ -91,6 +119,7 @@ class LoginPage extends StatelessWidget {
                                 padding:
                                     EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                                 child: TextField(
+                                  controller: widget.passRead,
                                   decoration: InputDecoration(
                                     hintText: '***********',
                                     fillColor: Colors.transparent,
@@ -107,13 +136,46 @@ class LoginPage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Navigator.pushNamed(context,
-                                      '/profile'); // Perform login action
+                                  String email = widget.emailRead.text;
+                                  String password = widget.passRead.text;
+
+                                  // Use the signInWithEmailAndPassword method to authenticate the user
+                                  FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                    email: email,
+                                    password: password,
+                                  )
+                                      .then((userCredential) {
+                                    // Login successful, navigate to the profile page or perform any other necessary actions
+                                    Navigator.pushNamed(context, '/profile');
+                                  }).catchError((error) {
+                                    // Login failed, display an error message to the user
+                                    print("Login error: $error");
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Login Error'),
+                                          content: Text(error.toString()),
+                                          actions: [
+                                            TextButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
                                 },
-                                child: Image.asset('assets/icons/loginico.png',
-                                    width: 121,
-                                    height: 39,
-                                    fit: BoxFit.contain),
+                                child: Image.asset(
+                                  'assets/icons/loginico.png',
+                                  width: 121,
+                                  height: 39,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                               InkWell(
                                 onTap: () {
@@ -157,6 +219,25 @@ class LoginPage extends StatelessWidget {
 }
 
 class SignupPage extends StatelessWidget {
+  final TextEditingController emailRead;
+  final TextEditingController passRead;
+  final TextEditingController userRead;
+  void recordUsername(String username, String email) {
+    String sanitizedEmail = email.replaceAll(RegExp('[^a-zA-Z0-9]'), '_');
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(sanitizedEmail)
+        .set({'username': username}).then((value) {
+      print("Username recorded in Firestore");
+    }).catchError((error) {
+      print("Failed to record username: $error");
+    });
+  }
+
+  SignupPage(
+      {required this.emailRead,
+      required this.passRead,
+      required this.userRead});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,6 +286,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
+                            controller: emailRead,
                             decoration: InputDecoration(
                               hintText: 'eg:johndoe@gmail.com',
                               fillColor: Colors.transparent,
@@ -221,6 +303,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
+                            controller: userRead,
                             decoration: InputDecoration(
                               hintText: 'eg:JohnDoe',
                               fillColor: Colors.transparent,
@@ -237,6 +320,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
+                            controller: passRead,
                             decoration: InputDecoration(
                               hintText: '***********',
                               fillColor: Colors.transparent,
@@ -295,8 +379,42 @@ class SignupPage extends StatelessWidget {
                     Center(
                       child: InkWell(
                         onTap: () {
-                          Navigator.pushNamed(
-                              context, '/profile'); // Perform signup action
+                          String email = emailRead.text;
+                          String password = passRead.text;
+                          String username = userRead.text;
+
+                          FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                            email: email,
+                            password: password,
+                          )
+                              .then((userCredential) {
+                            // Registration successful, record the username in Firestore
+                            recordUsername(username, email);
+
+                            // Navigate to the profile page or perform any other necessary actions
+                            Navigator.pushNamed(context, '/profile');
+                          }).catchError((error) {
+                            // Registration failed, display an error message to the user
+                            print("Registration error: $error");
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('Registration Error'),
+                                  content: Text(error.toString()),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          });
                         },
                         child: Image.asset(
                           'assets/icons/signupico.png',
@@ -329,7 +447,7 @@ class ProfilePage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
-            // Add your menu icon onPressed logic here
+            Navigator.pushNamed(context, '/'); // Add your button logic here
           },
         ),
         title: Text(
