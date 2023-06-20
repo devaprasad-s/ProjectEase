@@ -1,0 +1,186 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class LoginPage extends StatefulWidget {
+  final TextEditingController emailRead;
+  final TextEditingController passRead;
+  LoginPage({required this.emailRead, required this.passRead});
+  @override
+  LoginPageState createState() => LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
+  @override
+  void dispose() {
+    widget.emailRead.dispose();
+    widget.passRead.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SafeArea(
+            child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/login.png'),
+                      fit: BoxFit.cover),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(60.0),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 41.2,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'Project',
+                                  style: TextStyle(
+                                      fontFamily: 'Gilroy-Ultralight',
+                                      color: Colors.black),
+                                ),
+                                TextSpan(
+                                  text: 'Ease',
+                                  style: TextStyle(
+                                      fontFamily: 'Gilroy-Medium',
+                                      color: Color(0xFF5F1FC7)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
+                          Stack(
+                            children: [
+                              Image.asset('assets/fields/email.png'),
+                              Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
+                                child: TextField(
+                                  controller: widget.emailRead,
+                                  decoration: InputDecoration(
+                                    hintText: 'eg:JohnDoe',
+                                    fillColor: Colors.transparent,
+                                    filled: true,
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Stack(
+                            children: [
+                              Image.asset('assets/fields/password.png'),
+                              Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
+                                child: TextField(
+                                  controller: widget.passRead,
+                                  decoration: InputDecoration(
+                                    hintText: '***********',
+                                    fillColor: Colors.transparent,
+                                    filled: true,
+                                    border: InputBorder.none,
+                                  ),
+                                  obscureText: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  String email = widget.emailRead.text;
+                                  String password = widget.passRead.text;
+
+                                  // Use the signInWithEmailAndPassword method to authenticate the user
+                                  FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                    email: email,
+                                    password: password,
+                                  )
+                                      .then((userCredential) {
+                                    // Login successful, navigate to the profile page or perform any other necessary actions
+                                    Navigator.pushNamed(context, '/profile');
+                                  }).catchError((error) {
+                                    // Login failed, display an error message to the user
+                                    print("Login error: $error");
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Login Error'),
+                                          content: Text(error.toString()),
+                                          actions: [
+                                            TextButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
+                                },
+                                child: Image.asset(
+                                  'assets/icons/loginico.png',
+                                  width: 121,
+                                  height: 39,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(context,
+                                      '/signup'); // Perform login action
+                                },
+                                child: Image.asset('assets/icons/signupico.png',
+                                    width: 121,
+                                    height: 39,
+                                    fit: BoxFit.contain),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Center(
+                            child: Text("Or",
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontFamily: 'Product Sans',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal)),
+                          ),
+                          SizedBox(height: 20),
+                          Center(
+                            child: InkWell(
+                              onTap: () {
+                                print(
+                                    "tapped on container"); // Perform login action
+                              },
+                              child: Image.asset('assets/icons/gologin.png',
+                                  width: 211, height: 37, fit: BoxFit.contain),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ))));
+  }
+}

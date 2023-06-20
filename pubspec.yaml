@@ -11,12 +11,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  image_picker:
+  path_provider:
   english_words: ^4.0.0
   provider: ^6.0.0
   firebase_core: ^2.13.1
   firebase_auth: ^4.6.2
   cloud_firestore: ^4.8.0
+  firebase_storage: ^11.2.2
 
 dev_dependencies:
   flutter_test:
@@ -34,10 +36,10 @@ flutter:
   fonts:
     - family: Product Sans
       fonts:
+       - asset: assets/fonts/Product Sans Regular.ttf
        - asset: assets/fonts/Product Sans Bold Italic.ttf
        - asset: assets/fonts/Product Sans Bold.ttf
        - asset: assets/fonts/Product Sans Italic.ttf
-       - asset: assets/fonts/Product Sans Regular.ttf
     - family: Gilroy-Ultralight
       fonts:
        - asset: assets/fonts/Gilroy-Ultralight.ttf
