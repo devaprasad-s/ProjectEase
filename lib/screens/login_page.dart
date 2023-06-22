@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
   final TextEditingController emailRead;
@@ -101,7 +102,7 @@ class LoginPageState extends State<LoginPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              InkWell(
+                              GestureDetector(
                                 onTap: () {
                                   String email = widget.emailRead.text;
                                   String password = widget.passRead.text;
@@ -135,24 +136,86 @@ class LoginPageState extends State<LoginPage> {
                                         );
                                       },
                                     );
-                                  });
+                                  }); // Handle button press
                                 },
-                                child: Image.asset(
-                                  'assets/icons/loginico.png',
-                                  width: 121,
-                                  height: 39,
-                                  fit: BoxFit.contain,
+                                child: Container(
+                                  width: 114.26,
+                                  height: 31.17,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 27.59),
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: ShapeDecoration(
+                                    color: Color(0xFFD6F0FF),
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          width: 0.43,
+                                          color: Color(0xFF413D4B)),
+                                      borderRadius: BorderRadius.circular(6.90),
+                                    ),
+                                    shadows: [
+                                      BoxShadow(
+                                        color: Color(0xAF000000),
+                                        blurRadius: 3.45,
+                                        offset: Offset(1.72, 1.72),
+                                        spreadRadius: 0,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: Color(0xFF413D4B),
+                                        fontSize: 14,
+                                        fontFamily: 'Product Sans',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.0,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              InkWell(
+                              GestureDetector(
                                 onTap: () {
                                   Navigator.pushNamed(context,
-                                      '/signup'); // Perform login action
+                                      '/signup'); // Handle button press
                                 },
-                                child: Image.asset('assets/icons/signupico.png',
-                                    width: 121,
-                                    height: 39,
-                                    fit: BoxFit.contain),
+                                child: Container(
+                                  width: 113,
+                                  height: 31,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 27.59),
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: ShapeDecoration(
+                                    color: Color(0xFFE9D7DA),
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          width: 0.43,
+                                          color: Color(0xFF413D4B)),
+                                      borderRadius: BorderRadius.circular(6.90),
+                                    ),
+                                    shadows: [
+                                      BoxShadow(
+                                        color: Color(0xAF000000),
+                                        blurRadius: 3.45,
+                                        offset: Offset(1.72, 1.72),
+                                        spreadRadius: 0,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Sign Up',
+                                      style: TextStyle(
+                                        color: Color(0xFF413D4B),
+                                        fontSize: 14,
+                                        fontFamily: 'Product Sans',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -168,15 +231,65 @@ class LoginPageState extends State<LoginPage> {
                           ),
                           SizedBox(height: 20),
                           Center(
-                            child: InkWell(
-                              onTap: () {
-                                print(
-                                    "tapped on container"); // Perform login action
-                              },
-                              child: Image.asset('assets/icons/gologin.png',
-                                  width: 211, height: 37, fit: BoxFit.contain),
+                              child: GestureDetector(
+                            onTap: () {
+                              print(
+                                  "tapped on container"); // Handle button press
+                            },
+                            child: Container(
+                              width: 203,
+                              height: 29,
+                              padding:
+                                  const EdgeInsets.only(left: 9.83, right: 32),
+                              clipBehavior: Clip.antiAlias,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFFDCD5F9),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3.87),
+                                ),
+                                shadows: [
+                                  BoxShadow(
+                                    color: Color(0x7F000000),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4),
+                                    spreadRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 21.17,
+                                    height: 21.17,
+                                    decoration: ShapeDecoration(
+                                      color: Color(0xFFDCD5F9),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(3.70),
+                                      ),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/googleico.svg',
+                                      width: 21.17,
+                                      height: 21.17,
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                  Text(
+                                    'Login with Google',
+                                    style: TextStyle(
+                                      color: Color(0xFF413D4B),
+                                      fontSize: 15,
+                                      fontFamily: 'Product Sans',
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                          )),
                         ],
                       ),
                     ),

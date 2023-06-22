@@ -72,6 +72,35 @@ class ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  void recordDetails(String? selectedSemester, String username) {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
+    });
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
+    });
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
+    });
+  }
+
   void updateEmail(String value) {
     setState(() {
       email = value;

@@ -18,6 +18,40 @@ class AddProjectPageState extends State<AddProjectPage> {
     });
   }
 
+  String getBatchValue(String sn) {
+    int semester =
+        int.parse(sn.substring(1)); // Extract the semester number correctly
+    int currentYear = DateTime.now().year;
+    late int startYear;
+    late int endYear;
+    int ceilSemester = (semester / 2).floor();
+
+    switch (ceilSemester) {
+      case 0:
+        startYear = currentYear - 0;
+        endYear = currentYear + 4;
+        break;
+      case 1:
+        startYear = currentYear - 1;
+        endYear = currentYear + 3;
+        break;
+      case 2:
+        startYear = currentYear - 2;
+        endYear = currentYear + 2;
+        break;
+      case 3:
+        startYear = currentYear - 3;
+        endYear = currentYear + 1;
+        break;
+      case 4:
+        startYear = currentYear - 4;
+        endYear = currentYear + 0;
+        break;
+    }
+
+    return '$startYear-$endYear';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,6 +246,27 @@ class AddProjectPageState extends State<AddProjectPage> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 16),
+                    Row(children: [
+                      Text('Batch', style: TextStyle(fontSize: 16)),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: getBatchValue(widget.semester),
+                          //readOnly: true,
+                          decoration: InputDecoration(
+                            //filled: true,
+                            //fillColor: Colors.grey[200],
+                            hintText: 'Passed Semester',
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
                   ],
                 ),
               ),

@@ -164,7 +164,7 @@ class SignupPage extends StatelessWidget {
                       ],
                     ),
                     Center(
-                      child: InkWell(
+                      child: GestureDetector(
                         onTap: () {
                           String email = emailRead.text;
                           String password = passRead.text;
@@ -208,11 +208,40 @@ class SignupPage extends StatelessWidget {
                             );
                           });
                         },
-                        child: Image.asset(
-                          'assets/icons/signupico.png',
-                          width: 121,
-                          height: 39,
-                          fit: BoxFit.contain,
+                        child: Container(
+                          width: 113,
+                          height: 31,
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 27.59),
+                          clipBehavior: Clip.antiAlias,
+                          decoration: ShapeDecoration(
+                            color: Color(0xFFE9D7DA),
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.43, color: Color(0xFF413D4B)),
+                              borderRadius: BorderRadius.circular(6.90),
+                            ),
+                            shadows: [
+                              BoxShadow(
+                                color: Color(0xAF000000),
+                                blurRadius: 3.45,
+                                offset: Offset(1.72, 1.72),
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                color: Color(0xFF413D4B),
+                                fontSize: 14,
+                                fontFamily: 'Product Sans',
+                                fontWeight: FontWeight.w400,
+                                height: 1.0,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
