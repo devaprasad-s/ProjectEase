@@ -15,13 +15,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final TextEditingController emailRead = TextEditingController();
-  final TextEditingController passRead = TextEditingController();
-  final TextEditingController userRead = TextEditingController();
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,15 +31,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(
-              emailRead: emailRead,
-              passRead: passRead,
-            ),
-        '/signup': (context) => SignupPage(
-              emailRead: emailRead,
-              passRead: passRead,
-              userRead: userRead,
-            ),
+        '/': (context) => LoginPage(),
+        '/signup': (context) => SignupPage(),
         '/profile': (context) => ProfilePage(username: " "),
       },
     );

@@ -6,19 +6,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
-  final TextEditingController emailRead;
-  final TextEditingController passRead;
-  LoginPage({required this.emailRead, required this.passRead});
+  const LoginPage({Key? key}) : super(key: key);
   @override
-  LoginPageState createState() => LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailRead = TextEditingController();
+  final TextEditingController _passRead = TextEditingController();
   @override
   void dispose() {
-    widget.emailRead.dispose();
-    widget.passRead.dispose();
     super.dispose();
+    _emailRead.dispose();
+    _passRead.dispose();
   }
 
   @override
@@ -69,9 +69,9 @@ class LoginPageState extends State<LoginPage> {
                                 padding:
                                     EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                                 child: TextField(
-                                  controller: widget.emailRead,
+                                  controller: _emailRead,
                                   decoration: InputDecoration(
-                                    hintText: 'eg:JohnDoe',
+                                    hintText: 'eg:johndoe@gmail.com',
                                     fillColor: Colors.transparent,
                                     filled: true,
                                     border: InputBorder.none,
@@ -87,7 +87,7 @@ class LoginPageState extends State<LoginPage> {
                                 padding:
                                     EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                                 child: TextField(
-                                  controller: widget.passRead,
+                                  controller: _passRead,
                                   decoration: InputDecoration(
                                     hintText: '***********',
                                     fillColor: Colors.transparent,
@@ -104,8 +104,8 @@ class LoginPageState extends State<LoginPage> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  String email = widget.emailRead.text;
-                                  String password = widget.passRead.text;
+                                  String email = _emailRead.text;
+                                  String password = _passRead.text;
 
                                   // Use the signInWithEmailAndPassword method to authenticate the user
                                   FirebaseAuth.instance

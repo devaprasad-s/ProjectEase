@@ -5,10 +5,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_page.dart';
 
-class SignupPage extends StatelessWidget {
-  final TextEditingController emailRead;
-  final TextEditingController passRead;
-  final TextEditingController userRead;
+class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final TextEditingController _emailRead = TextEditingController();
+  final TextEditingController _passRead = TextEditingController();
+  final TextEditingController _userRead = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _emailRead.dispose();
+    _passRead.dispose();
+    _userRead.dispose();
+  }
 
   void recordUsername(String username, String email) {
     FirebaseFirestore.instance
@@ -21,10 +36,6 @@ class SignupPage extends StatelessWidget {
     });
   }
 
-  SignupPage(
-      {required this.emailRead,
-      required this.passRead,
-      required this.userRead});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +84,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
-                            controller: emailRead,
+                            controller: _emailRead,
                             decoration: InputDecoration(
                               hintText: 'eg:johndoe@gmail.com',
                               fillColor: Colors.transparent,
@@ -90,7 +101,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
-                            controller: userRead,
+                            controller: _userRead,
                             decoration: InputDecoration(
                               hintText: 'eg:JohnDoe',
                               fillColor: Colors.transparent,
@@ -107,7 +118,7 @@ class SignupPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
                           child: TextField(
-                            controller: passRead,
+                            controller: _passRead,
                             decoration: InputDecoration(
                               hintText: '***********',
                               fillColor: Colors.transparent,
@@ -166,9 +177,9 @@ class SignupPage extends StatelessWidget {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          String email = emailRead.text;
-                          String password = passRead.text;
-                          String username = userRead.text;
+                          String email = _emailRead.text;
+                          String password = _passRead.text;
+                          String username = _userRead.text;
                           FirebaseAuth.instance
                               .createUserWithEmailAndPassword(
                             email: email,
