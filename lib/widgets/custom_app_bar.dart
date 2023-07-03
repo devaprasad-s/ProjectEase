@@ -23,6 +23,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     color: Color(0xFFD1DEFF),
                   ),
                   child: Stack(children: [
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(Icons.menu)),
                     Center(
                       child: Text(
                         title,

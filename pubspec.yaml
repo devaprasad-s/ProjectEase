@@ -24,6 +24,8 @@ dependencies:
   path:
   file_picker:
   open_file: 
+  url_launcher:
+  shared_preferences:
   
 
 

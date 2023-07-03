@@ -2,21 +2,69 @@ import 'package:app_uno/screens/view_submissions.dart';
 import 'package:app_uno/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../db/sqlhelper.dart';
 import '../widgets/navbar.dart';
 
 class AdminProViewPage extends StatefulWidget {
-  //final String projectName;
+  final String groupNo;
 
-  //ProjectDetailsPage({required this.projectName});
+  AdminProViewPage({required this.groupNo});
 
   @override
   State<AdminProViewPage> createState() => _AdminProViewPageState();
 }
 
 class _AdminProViewPageState extends State<AdminProViewPage> {
+  TextEditingController _groupNoController = TextEditingController();
+  TextEditingController _member1Controller = TextEditingController();
+  TextEditingController _member2Controller = TextEditingController();
+  TextEditingController _member3Controller = TextEditingController();
+  TextEditingController _member4Controller = TextEditingController();
+  TextEditingController _guideController = TextEditingController();
+  List<String> guides = [];
   //Values values = RangeValues(0, 100);
   //double value = 0;
   //final String submissionType = "Design Phase";
+  @override
+  void initState() {
+    super.initState();
+    // Assign the username from the widget parameter to the local variable
+    fetchGroupDetails(widget.groupNo);
+    fetchGuides();
+  }
+
+  Future<void> fetchGroupDetails(String groupNo) async {
+    final groupDetails = await SQLHelper.getGroupDetails(int.parse(groupNo));
+    final projectDetails =
+        await SQLHelper.getProjectDetails(int.parse(groupNo));
+    if (groupDetails != null && projectDetails != null) {
+      final String member1 = groupDetails['member1'];
+      final String member2 = groupDetails['member2'];
+      final String member3 = groupDetails['member3'];
+      final String member4 = groupDetails['member4'];
+      final String? guide = groupDetails['guide'];
+      _groupNoController.text = groupNo.toString();
+      _member1Controller.text = member1;
+      _member2Controller.text = member2;
+      _member3Controller.text = member3;
+      print('member1: $member1');
+      print('member2: $member2');
+      print('member3: $member3');
+      print('member4: $member4');
+      print('guide: $guide');
+    } else {
+      print('Group/Project not found');
+    }
+
+    // Use the user details as neede
+  }
+
+  Future<void> fetchGuides() async {
+    final List<String> fetchedGuides = await SQLHelper.getGuides();
+    setState(() {
+      guides = fetchedGuides;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +116,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                             width: 250,
                             height: 30,
                             child: TextFormField(
+                              controller: _groupNoController,
                               decoration: InputDecoration(
                                 //hintText: '',
                                 contentPadding: EdgeInsets.symmetric(
@@ -101,6 +150,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                 width: 250,
                                 height: 30,
                                 child: TextFormField(
+                                  controller: _member1Controller,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.person_outlined,
                                         color: Colors.black),
@@ -123,6 +173,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                 width: 250,
                                 height: 30,
                                 child: TextFormField(
+                                  controller: _member2Controller,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.person_outlined,
                                         color: Colors.black),
@@ -145,6 +196,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                 width: 250,
                                 height: 30,
                                 child: TextFormField(
+                                  controller: _member3Controller,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.person_outlined,
                                         color: Colors.black),
@@ -167,6 +219,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                 width: 250,
                                 height: 30,
                                 child: TextFormField(
+                                  controller: _member4Controller,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.person_outlined,
                                         color: Colors.black),
@@ -204,21 +257,35 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                           SizedBox(
                             width: 250,
                             height: 30,
-                            child: TextFormField(
-                              //readOnly: true,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.person_outlined,
-                                    color: Colors.black),
-                                hintText: 'Not Assigned',
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 8), // Adjust the vertical padding
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                            child: DropdownButtonFormField<String>(
+                                value: _guideController.text.isNotEmpty
+                                    ? _guideController.text
+                                    : null,
+                                //value: _member3.text,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.person_outlined,
+                                      color: Colors.black),
+                                  filled: true,
+                                  fillColor: Color(0xFFCADCFF),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                              //onChanged: updateGroupNo,
-                            ),
+                                items: guides.map((String username) {
+                                  return DropdownMenuItem<String>(
+                                    value: username,
+                                    child: Text(username),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _guideController.text = newValue!;
+
+                                    // Handle the selected value here
+                                  });
+                                }),
                           ),
                         ])),
                       ]),

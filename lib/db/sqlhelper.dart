@@ -67,6 +67,14 @@ class SQLHelper {
       INSERT INTO users (id,email, username, password, phno)
       VALUES (6,'remya@example.com', 'Remya R', '1234', NULL)
       """);*/
+    /* await database.execute("""
+      INSERT INTO users (id,email, username, password, phno)
+      VALUES (7,'aparna@example.com', 'Aparna A S', '1234', NULL)
+      """);
+    await database.execute("""
+      INSERT INTO users (id,email, username, password, phno)
+      VALUES (8,'arun@example.com', 'Arun P Kuttappan', '1234', NULL)
+      """);*/
 
     await database.execute("""
     CREATE TABLE IF NOT EXISTS users(
@@ -124,6 +132,17 @@ class SQLHelper {
       FOREIGN KEY (groupno) REFERENCES projects(groupno)
     )
   """);
+
+    await database.execute("""
+CREATE TABLE IF NOT EXISTS comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  userId INTEGER,
+  comment TEXT,
+  groupno INTEGER,
+  FOREIGN KEY (userId) REFERENCES users(id),
+  FOREIGN KEY (groupno) REFERENCES groups(groupno)
+)
+""");
   }
 
   static Future<int> addUserDetails(
@@ -164,6 +183,29 @@ class SQLHelper {
     );
   }
 
+  ///
+  ///
+  ///
+  ///
+  ///
+  ///
+  static Future<void> editGuideGroupNo(String guide, int groupno) async {
+    final db = await SQLHelper.db();
+    await db.update(
+      'groups',
+      {'guide': guide},
+      where: 'groupno = ?',
+      whereArgs: [groupno],
+    );
+    await db.update(
+      'groups',
+      {'guide': guide},
+      where: 'groupno = ?',
+      whereArgs: [groupno],
+    );
+  }
+
+  ///
   ///
   ///
   ///
@@ -286,6 +328,24 @@ class SQLHelper {
   static Future<int> addGroupDetails(int groupno, String? guide, String member1,
       String member2, String member3, String member4) async {
     final db = await SQLHelper.db();
+
+    // Check if any of the members are already part of a group
+    final members = [member1, member2, member3, member4];
+    for (final member in members) {
+      final result = await db.rawQuery("""
+      SELECT groupno FROM users WHERE username = '$member' AND groupno IS NOT NULL
+    """);
+
+      if (result.isNotEmpty) {
+        await db.update(
+          'users',
+          {'groupno': groupno},
+          where: "username = ?",
+          whereArgs: [member],
+        );
+      }
+    }
+
     final data = {
       "groupno": groupno,
       "guide": guide,
@@ -296,6 +356,7 @@ class SQLHelper {
     };
     final id = await db.insert("groups", data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
+
     final List<Map<String, dynamic>> result1 =
         await db.query('groups', orderBy: 'groupno');
 
@@ -371,6 +432,14 @@ class SQLHelper {
     return result.map((user) => user['username'] as String).toList();
   }
 
+  static Future<List<String>> getGuides() async {
+    final db = await SQLHelper.db();
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT username FROM users WHERE id < 10',
+    );
+    return result.map((user) => user['username'] as String).toList();
+  }
+
   static Future<List<Map<String, dynamic>>> getData() async {
     final db = await SQLHelper.db();
     return db.query('users', orderBy: 'id');
@@ -395,7 +464,10 @@ class SQLHelper {
   Future<void> insertFilePath(int groupno, String? filePath) async {
     final db = await SQLHelper.db();
     await db.insert(
-        'project_documents_path', {'groupno': groupno, 'abstract': filePath});
+      'project_documents_path',
+      {'groupno': groupno, 'abstract': filePath},
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
 
     final List<Map<String, dynamic>> result =
         await db.query('project_documents_path', orderBy: 'groupno');

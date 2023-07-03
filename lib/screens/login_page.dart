@@ -48,12 +48,14 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (context) => ProfilePage(username: username)),
           );
         } else if (id < 10 && id > 2) {
+          print("HEYYO THIS IS YOUR username $username");
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => FacultyProfilePage(username: username)),
           );
         } else {
+          print("HEYYO THIS IS YOUR username $username");
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

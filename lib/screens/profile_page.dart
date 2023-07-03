@@ -45,11 +45,12 @@ class ProfilePageState extends State<ProfilePage> {
     if (userDetails != null) {
       final String email = userDetails['email'];
       final String phone = userDetails['phno'];
-      final int groupno = userDetails['groupno'];
       _userController.text = username;
       _emailController.text = email;
       _phoneController.text = phone;
-      final projectDetails = await SQLHelper.getProjectDetails(groupno);
+      final int? groupno = userDetails['groupno'];
+
+      final projectDetails = await SQLHelper.getProjectDetails(groupno!);
       if (projectDetails != null) {
         final String projname = projectDetails['projname'];
         print('PROJJJJJNAME $projname');

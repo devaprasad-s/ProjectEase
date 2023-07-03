@@ -10,9 +10,6 @@ class NavDrawer extends StatelessWidget {
     return Drawer(
         child: ListView(
       children: [
-        SizedBox(
-          height: 26,
-        ),
         ListTile(
           leading: Icon(Icons.person_outline),
           title: Text('Profile'),

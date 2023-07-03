@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import '../db/sqlhelper.dart';
 import 'addproject_page.dart';
 import 'projectdesc_page.dart';
 import 'package:app_uno/widgets/custom_app_bar.dart';
@@ -28,6 +29,22 @@ class AdminProfilePageState extends State<AdminProfilePage> {
   bool editingMode = false;
   bool displayButton = false;
   String projectName = '';
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _userController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Assign the username from the widget parameter to the local variable
+    fetchUserDetails(widget.username);
+  }
+
+  Future<void> fetchUserDetails(String username) async {
+    print('This is $username');
+    final userDetails = await SQLHelper.getUserDetails(username);
+    _emailController.text = userDetails!['email'];
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -42,35 +59,6 @@ class AdminProfilePageState extends State<AdminProfilePage> {
   void updateSemester(String? value) {
     setState(() {
       selectedSemester = value;
-    });
-  }
-
-  void recordDetails(String? selectedSemester, String username) {
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(widget.username)
-        .set({'semester': selectedSemester}).then((value) {
-      print("Success");
-    }).catchError((error) {
-      print("Failed  $error");
-    });
-
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(widget.username)
-        .set({'semester': selectedSemester}).then((value) {
-      print("Success");
-    }).catchError((error) {
-      print("Failed  $error");
-    });
-
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(widget.username)
-        .set({'semester': selectedSemester}).then((value) {
-      print("Success");
-    }).catchError((error) {
-      print("Failed  $error");
     });
   }
 
@@ -192,7 +180,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      enteredName ?? '',
+                                      enteredName ?? widget.username,
                                       style: TextStyle(
                                         fontSize: 22,
                                         fontWeight: FontWeight.w700,
@@ -222,6 +210,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                         SizedBox(width: 36),
                         Expanded(
                           child: TextField(
+                            readOnly: true,
                             decoration: InputDecoration(
                               hintText: 'Enter your email',
                               contentPadding:
@@ -232,8 +221,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                               ),
                             ),
                             onChanged: updateEmail,
-                            controller:
-                                TextEditingController(text: 'Dev@gmail.com'),
+                            controller: _emailController,
                           ),
                         ),
                       ],
@@ -244,7 +232,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                     Row(
                       children: [
                         Text(
-                          'Phone No',
+                          'User Type',
                           style: TextStyle(
                             fontSize: 18,
                           ),
@@ -254,6 +242,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                         ),
                         Expanded(
                           child: TextField(
+                            readOnly: true,
                             decoration: InputDecoration(
                               hintText: 'Enter your phone number',
                               contentPadding: EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -262,6 +251,7 @@ class AdminProfilePageState extends State<AdminProfilePage> {
                               ),
                             ),
                             onChanged: updatePhoneNumber,
+                            controller: TextEditingController(text: 'Admin'),
                           ),
                         ),
                       ],
