@@ -1,7 +1,9 @@
 import 'package:app_uno/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uno/screens/admin_projectview.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'dart:io';
 
@@ -57,8 +59,8 @@ class _ProjectsPageState extends State<ProjectsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  AdminProViewPage(groupNo: groupNo),
+                              builder: (context) => AdminProViewPage(
+                                  groupNo: groupNo, projname: projectName),
                             ),
                           );
                         },
