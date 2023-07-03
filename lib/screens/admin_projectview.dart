@@ -1,14 +1,17 @@
 import 'package:app_uno/screens/view_submissions.dart';
 import 'package:app_uno/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../db/sqlhelper.dart';
 import '../widgets/navbar.dart';
 
 class AdminProViewPage extends StatefulWidget {
   final String groupNo;
+  final String projname;
 
-  AdminProViewPage({required this.groupNo});
+  AdminProViewPage({required this.groupNo, required this.projname});
 
   @override
   State<AdminProViewPage> createState() => _AdminProViewPageState();
@@ -47,6 +50,7 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
       _member1Controller.text = member1;
       _member2Controller.text = member2;
       _member3Controller.text = member3;
+      _guideController.text = guide!;
       print('member1: $member1');
       print('member2: $member2');
       print('member3: $member3');
@@ -66,6 +70,24 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
     });
   }
 
+  Future<void> fetchDocDetails(String groupNo) async {
+    final documentDetails =
+        await SQLHelper.getDocumentDetails(int.parse(groupNo));
+    if (documentDetails != null) {
+      final String abstractDoc = documentDetails['abstract'];
+
+      OpenFile.open(abstractDoc);
+      // Use the user details as needed
+      print('PATH: $abstractDoc');
+
+      // Store the abstract document path in shared preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('abstractDocumentPath', abstractDoc);
+    } else {
+      print('User not found');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //RangeLabels labels =
@@ -73,11 +95,11 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
     return Scaffold(
       drawer: NavDrawer(),
       //extendBodyBehindAppBar: true,
-      appBar: CustomAppBar(title: 'projectName'),
+      appBar: CustomAppBar(title: widget.projname),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height + 100,
+          height: MediaQuery.of(context).size.height + 300,
           //width: MediaQuery.of(context).size.width,
           child: SafeArea(
             child: Stack(
@@ -282,8 +304,9 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     _guideController.text = newValue!;
-
-                                    // Handle the selected value here
+                                    SQLHelper.updateGuide(
+                                        int.parse(widget.groupNo), newValue);
+                                    // Handle   the selected value here
                                   });
                                 }),
                           ),
@@ -325,6 +348,47 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                       Row(children: [
                         GestureDetector(
                           onTap: () {
+                            fetchDocDetails(widget.groupNo);
+                            /*Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewSubmissionPage(
+                                      projectName: widget.projectName,
+                                      submissionType: submissionType),
+                                ),
+                              );*/
+                          },
+                          child: SizedBox(
+                            width: 370,
+                            height: 70,
+                            //color: Color(0xFFD1DEFF),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                  color: Color(0xFFF6F6F6),
+                                  border: Border.all(color: Colors.black)),
+                              child: Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(children: [
+                                    Text(
+                                      'Introduction.pdf',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    Spacer(),
+                                    Text("Download"),
+                                    SizedBox(width: 7),
+                                    Icon(Icons.arrow_forward_ios_outlined)
+                                  ])),
+                            ),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 16),
+                      Row(children: [
+                        GestureDetector(
+                          onTap: () {
                             /*Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -347,6 +411,86 @@ class _AdminProViewPageState extends State<AdminProViewPage> {
                                   child: Row(children: [
                                     Text(
                                       'Design.pdf',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    Spacer(),
+                                    Text("Download"),
+                                    SizedBox(width: 7),
+                                    Icon(Icons.arrow_forward_ios_outlined)
+                                  ])),
+                            ),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 16),
+                      Row(children: [
+                        GestureDetector(
+                          onTap: () {
+                            /*Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewSubmissionPage(
+                                      projectName: widget.projectName,
+                                      submissionType: submissionType),
+                                ),
+                              );*/
+                          },
+                          child: SizedBox(
+                            width: 370,
+                            height: 70,
+                            //color: Color(0xFFD1DEFF),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                  color: Color(0xFFF6F6F6),
+                                  border: Border.all(color: Colors.black)),
+                              child: Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(children: [
+                                    Text(
+                                      'Implementation.pdf',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    Spacer(),
+                                    Text("Download"),
+                                    SizedBox(width: 7),
+                                    Icon(Icons.arrow_forward_ios_outlined)
+                                  ])),
+                            ),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 16),
+                      Row(children: [
+                        GestureDetector(
+                          onTap: () {
+                            /*Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewSubmissionPage(
+                                      projectName: widget.projectName,
+                                      submissionType: submissionType),
+                                ),
+                              );*/
+                          },
+                          child: SizedBox(
+                            width: 370,
+                            height: 70,
+                            //color: Color(0xFFD1DEFF),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                  color: Color(0xFFF6F6F6),
+                                  border: Border.all(color: Colors.black)),
+                              child: Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(children: [
+                                    Text(
+                                      'Final.pdf',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: 17,

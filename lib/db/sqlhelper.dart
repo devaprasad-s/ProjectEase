@@ -189,21 +189,21 @@ CREATE TABLE IF NOT EXISTS comments (
   ///
   ///
   ///
-  static Future<void> editGuideGroupNo(String guide, int groupno) async {
+  static Future<void> updateGuide(int groupNo, String guide) async {
     final db = await SQLHelper.db();
     await db.update(
       'groups',
       {'guide': guide},
-      where: 'groupno = ?',
-      whereArgs: [groupno],
-    );
-    await db.update(
-      'groups',
-      {'guide': guide},
-      where: 'groupno = ?',
-      whereArgs: [groupno],
+      where: 'groupNo = ?',
+      whereArgs: [groupNo],
     );
   }
+
+  ///
+  ///
+  ///
+  ///
+  ///
 
   ///
   ///

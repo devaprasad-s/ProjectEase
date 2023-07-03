@@ -90,9 +90,9 @@ class AddProjectPageState extends State<AddProjectPage> {
     }
   }*/
 
-  Future<void> fetchDocDetails(String groupno) async {
+  Future<void> fetchDocDetails(String groupNo) async {
     final documentDetails =
-        await SQLHelper.getDocumentDetails(int.parse(groupNo!));
+        await SQLHelper.getDocumentDetails(int.parse(groupNo));
     if (documentDetails != null) {
       final String abstractDoc = documentDetails['abstract'];
 
@@ -100,6 +100,10 @@ class AddProjectPageState extends State<AddProjectPage> {
       OpenFile.open(abstractDoc);
       // Use the user details as needed
       print('PATH: $abstractDoc');
+
+      // Store the abstract document path in shared preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('abstractDocumentPath', abstractDoc);
     } else {
       print('User not found');
     }
@@ -170,9 +174,13 @@ class AddProjectPageState extends State<AddProjectPage> {
     if (result != null) {
       final file = result.files.single;
       final filePath = file.path;
-      print('THIS IS YOUR FILE PATH$filePath');
+      print('THIS IS YOUR FILE PATH: $filePath');
       final sqlHelper = SQLHelper();
       await sqlHelper.insertFilePath(int.parse(_groupNo.text), filePath);
+
+      // Store the uploaded file path in shared preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('abstractDocumentPath', filePath!);
     }
   }
 
