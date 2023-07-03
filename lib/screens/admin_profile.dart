@@ -5,22 +5,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import '../db/sqlhelper.dart';
 import 'addproject_page.dart';
 import 'projectdesc_page.dart';
 import 'package:app_uno/widgets/custom_app_bar.dart';
+import 'package:app_uno/screens/admin_deadlines.dart';
+import 'package:app_uno/widgets/navbar.dart';
 
-class ProfilePage extends StatefulWidget {
+class AdminProfilePage extends StatefulWidget {
   final String username;
-  ProfilePage({required this.username});
+  AdminProfilePage({required this.username});
   @override
-  ProfilePageState createState() => ProfilePageState();
+  AdminProfilePageState createState() => AdminProfilePageState();
 }
 
-class ProfilePageState extends State<ProfilePage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _userController = TextEditingController();
+class AdminProfilePageState extends State<AdminProfilePage> {
   File? _image;
   String? enteredName;
   String? selectedSemester;
@@ -30,62 +28,6 @@ class ProfilePageState extends State<ProfilePage> {
   bool editingMode = false;
   bool displayButton = false;
   String projectName = '';
-  late String username;
-
-  @override
-  void initState() {
-    super.initState();
-    // Assign the username from the widget parameter to the local variable
-    fetchUserDetails(widget.username);
-  }
-
-  Future<void> fetchUserDetails(String username) async {
-    final userDetails = await SQLHelper.getUserDetails(username);
-
-    if (userDetails != null) {
-      final String email = userDetails['email'];
-      final String phone = userDetails['phno'];
-      final int groupno = userDetails['groupno'];
-      _userController.text = username;
-      _emailController.text = email;
-      _phoneController.text = phone;
-      final projectDetails = await SQLHelper.getProjectDetails(groupno);
-      if (projectDetails != null) {
-        final String projname = projectDetails['projname'];
-        print('PROJJJJJNAME $projname');
-        displayButton = true;
-        setState(() {
-          projectName = projname;
-        });
-      }
-      // Use the user details as needed
-      print('Email: $email');
-      print('Phone: $phone');
-    } else {
-      print('User not found');
-    }
-  }
-
-  _navigateToAddProject(BuildContext context) async {
-    print('HEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY');
-    print(widget.username);
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddProjectPage(
-            username: _userController.text, semester: selectedSemester!),
-      ),
-    );
-
-    // Handle the result returned from Page B
-    if (result != null) {
-      // Assign the result to the variable
-      displayButton = true;
-      setState(() {
-        projectName = result;
-      });
-    }
-  }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -100,6 +42,35 @@ class ProfilePageState extends State<ProfilePage> {
   void updateSemester(String? value) {
     setState(() {
       selectedSemester = value;
+    });
+  }
+
+  void recordDetails(String? selectedSemester, String username) {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
+    });
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
+    });
+
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.username)
+        .set({'semester': selectedSemester}).then((value) {
+      print("Success");
+    }).catchError((error) {
+      print("Failed  $error");
     });
   }
 
@@ -136,6 +107,7 @@ class ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: NavDrawer(),
         appBar: CustomAppBar(title: 'Profile'),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
@@ -190,8 +162,8 @@ class ProfilePageState extends State<ProfilePage> {
                                   radius: 60,
                                   backgroundImage: _image != null
                                       ? FileImage(_image!)
-                                      : AssetImage(
-                                          'assets/images/pexels-photo-771742.jpeg',
+                                      : NetworkImage(
+                                          'https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg',
                                         ) as ImageProvider<Object>,
                                 ),
                                 SizedBox(
@@ -220,7 +192,7 @@ class ProfilePageState extends State<ProfilePage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      enteredName ?? widget.username,
+                                      enteredName ?? '',
                                       style: TextStyle(
                                         fontSize: 22,
                                         fontWeight: FontWeight.w700,
@@ -235,55 +207,6 @@ class ProfilePageState extends State<ProfilePage> {
                                 ),
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Semester',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                        SizedBox(width: 26),
-                        //Spacer(),
-                        Expanded(
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                              child: DropdownButton(
-                                iconSize: 20,
-                                value: selectedSemester,
-                                isExpanded: true,
-                                onChanged: updateSemester,
-                                items: [
-                                  'S1',
-                                  'S2',
-                                  'S3',
-                                  'S4',
-                                  'S5',
-                                  'S6',
-                                  'S7',
-                                  'S8'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(
-                                      value,
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                     SizedBox(
                       height: 20,
@@ -309,7 +232,8 @@ class ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             onChanged: updateEmail,
-                            controller: _emailController,
+                            controller:
+                                TextEditingController(text: 'Dev@gmail.com'),
                           ),
                         ),
                       ],
@@ -338,7 +262,6 @@ class ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             onChanged: updatePhoneNumber,
-                            controller: _phoneController,
                           ),
                         ),
                       ],
@@ -346,54 +269,45 @@ class ProfilePageState extends State<ProfilePage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Positioned(
-                      top: 420,
-                      left: 0,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (selectedSemester != null) {
-                            _navigateToAddProject(context);
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Error"),
-                                  content: Text("Please select a semester."),
-                                  actions: [
-                                    TextButton(
-                                      child: Text("OK"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        },
-                        child: Container(
-                          width: 140,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFB0D3F4),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.add, color: Colors.black),
-                              SizedBox(width: 8),
-                              if (displayButton)
-                                Text(
-                                  'Edit Project',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w200,
-                                  ),
-                                ),
-                              if (!displayButton)
+                    /*if (!displayButton)
+                      Positioned(
+                        top: 420,
+                        left: 20,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (selectedSemester != null) {
+                              _navigateToAddProject(context);
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Error"),
+                                    content: Text("Please select a semester."),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("OK"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFB0D3F4),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.add, color: Colors.black),
+                                SizedBox(width: 8),
                                 Text(
                                   'Add Project',
                                   style: TextStyle(
@@ -401,15 +315,12 @@ class ProfilePageState extends State<ProfilePage> {
                                     fontWeight: FontWeight.w200,
                                   ),
                                 ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    if (displayButton)
+                      )
+                    else
                       // Only display the button if displayButton is true
                       Positioned(
                         top: 420,
@@ -423,7 +334,6 @@ class ProfilePageState extends State<ProfilePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ProjectDetailsPage(
-                                      username: widget.username,
                                       projectName: projectName),
                                 ),
                               ); // Perform the action on button click
@@ -471,7 +381,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
-                      )
+                      )*/
                   ],
                 ),
               ),

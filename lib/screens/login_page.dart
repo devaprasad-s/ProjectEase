@@ -1,9 +1,11 @@
-import 'dart:io';
+//import 'dart:io';
+import 'package:app_uno/screens/admin_profile.dart';
+import 'package:app_uno/screens/faculty_profile.dart';
+import 'package:app_uno/screens/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../db/sqlhelper.dart';
+//import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -19,6 +21,62 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
     _emailRead.dispose();
     _passRead.dispose();
+  }
+
+  // Function to handle login button press
+  void _onLoginButtonPressed() async {
+    final String email = _emailRead.text.trim();
+    final String password = _passRead.text.trim();
+
+    // Call the SQLHelper to get user details based on the entered username/email
+    final bool isAuthenticated =
+        await SQLHelper.authenticateUser(email, password);
+
+    if (isAuthenticated) {
+      // User found, verify password
+      // final String storedPassword = userDetails['password'];
+
+      final userDetails = await SQLHelper.getUserDetailsEmail(email);
+      if (userDetails != null) {
+        final String username = userDetails['username'];
+        final int id = userDetails['id'];
+        // Use the user details as needed
+        if (id > 10) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(username: username)),
+          );
+        } else if (id < 10 && id > 2) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => FacultyProfilePage(username: username)),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AdminProfilePage(username: username)),
+          );
+        }
+      } else {
+        print('User not found');
+      }
+
+      // Invalid password, show an error message
+      // (You can use a SnackBar or showDialog to show the message)
+      _showErrorMessage("Invalid password");
+    } else {
+      // User not found, show an error message
+      _showErrorMessage("Authentication failed");
+    }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+    ));
   }
 
   @override
@@ -99,16 +157,40 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                          Stack(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(top: 0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context,
+                                          '/'); // Add your button logic here
+                                    },
+                                    child: Text(
+                                      'Forgot password?',
+                                      style: TextStyle(
+                                        fontFamily: 'Product Sans',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  String email = _emailRead.text;
-                                  String password = _passRead.text;
+                                  _onLoginButtonPressed();
 
                                   // Use the signInWithEmailAndPassword method to authenticate the user
-                                  FirebaseAuth.instance
+                                  /*FirebaseAuth.instance
                                       .signInWithEmailAndPassword(
                                     email: email,
                                     password: password,
@@ -136,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                                         );
                                       },
                                     );
-                                  }); // Handle button press
+                                  });*/ // Handle button press
                                 },
                                 child: Container(
                                   width: 114.26,
@@ -219,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 20),
+                          /*SizedBox(height: 20),
                           Center(
                             child: Text("Or",
                                 textAlign: TextAlign.center,
@@ -228,8 +310,8 @@ class _LoginPageState extends State<LoginPage> {
                                     fontFamily: 'Product Sans',
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal)),
-                          ),
-                          SizedBox(height: 20),
+                          ),*/
+                          /*SizedBox(height: 20),
                           Center(
                               child: GestureDetector(
                             onTap: () {
@@ -289,7 +371,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                             ),
-                          )),
+                          )),*/
                         ],
                       ),
                     ),

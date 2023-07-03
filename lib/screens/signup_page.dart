@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../db/sqlhelper.dart';
 import 'profile_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -16,6 +20,11 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailRead = TextEditingController();
   final TextEditingController _passRead = TextEditingController();
   final TextEditingController _userRead = TextEditingController();
+  final TextEditingController _phoneRead = TextEditingController();
+  final TextEditingController _confirmPass = TextEditingController();
+  final RegExp emailRegex = RegExp(
+    r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+  );
 
   @override
   void dispose() {
@@ -23,17 +32,44 @@ class _SignupPageState extends State<SignupPage> {
     _emailRead.dispose();
     _passRead.dispose();
     _userRead.dispose();
+    _phoneRead.dispose();
+    _confirmPass.dispose();
   }
 
-  void recordUsername(String username, String email) {
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(username)
-        .set({'email': email}).then((value) {
-      print("Username and Email recorded in Firestore");
-    }).catchError((error) {
-      print("Failed to record username: $error");
-    });
+  Future<void> saveUserDetails(
+      String username, String email, String password, String phoneno) async {
+    if (username.trim() == "" ||
+        email.trim() == "" ||
+        password.trim() == "" ||
+        phoneno.trim() == "") {
+      showSnackbar("Enter all the fields");
+    } else {
+      final existingUsers = await SQLHelper.userAlreadyFound(username, email);
+      if (existingUsers.isNotEmpty) {
+        // User already exists
+        showSnackbar('User already exists');
+      } else {
+        await SQLHelper.addUserDetails(username, email, password, phoneno);
+        // You can perform any additional actions after saving the user details
+        // For example, navigate to the profile page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(
+              username: username,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -143,6 +179,29 @@ class _SignupPageState extends State<SignupPage> {
                               border: InputBorder.none,
                             ),
                             obscureText: true,
+                            controller: _confirmPass,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Stack(
+                      children: [
+                        Image.asset('assets/fields/phoneno.png'),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15.0, 12.0, 15.0, 10.0),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            controller: _phoneRead,
+                            decoration: InputDecoration(
+                              hintText: '90xxxxx088',
+                              fillColor: Colors.transparent,
+                              filled: true,
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
                       ],
@@ -180,44 +239,18 @@ class _SignupPageState extends State<SignupPage> {
                           String email = _emailRead.text;
                           String password = _passRead.text;
                           String username = _userRead.text;
-                          FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                            email: email,
-                            password: password,
-                          )
-                              .then((userCredential) {
-                            // Registration successful, record the username in Firestore
-                            recordUsername(username, email);
-
-                            // Navigate to the profile page or perform any other necessary actions
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ProfilePage(username: username),
-                              ),
-                            );
-                          }).catchError((error) {
-                            // Registration failed, display an error message to the user
-                            print("Registration error: $error");
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Registration Error'),
-                                  content: Text(error.toString()),
-                                  actions: [
-                                    TextButton(
-                                      child: Text('OK'),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          });
+                          String phone = _phoneRead.text;
+                          if (password == _confirmPass.text &&
+                              phone.length == 10 &&
+                              emailRegex.hasMatch(email)) {
+                            saveUserDetails(username, email, password, phone);
+                          } else if (password != _confirmPass.text) {
+                            showSnackbar("Passwords don't match try again");
+                          } else if (phone.length != 10) {
+                            showSnackbar("Enter a valid phone number");
+                          } else if (!emailRegex.hasMatch(email)) {
+                            showSnackbar("Enter a valid email address");
+                          }
                         },
                         child: Container(
                           width: 113,
